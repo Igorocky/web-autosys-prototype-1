@@ -1,0 +1,10 @@
+@(allProps: List[IntProp])(implicit messages: Messages)
+
+    <table border="1" cellpadding="1" cellspacing="1">
+        @for(prop <- allProps) {
+            <tr>
+                <td>@prop.key</td>
+                <td>@prop.value</td>
+            </tr>
+        }
+    </table>

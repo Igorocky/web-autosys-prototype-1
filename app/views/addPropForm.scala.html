@@ -1,0 +1,30 @@
+@(propForm: Form[IntProp])(implicit messages: Messages)
+
+@textInput(name: String, form: Form[_]) = {
+    <input type="text" name="@name" value="@form(name).value.getOrElse("")"/>
+}
+
+@label(name: String, form: Form[_]) = {
+    @name @*[@{(form(name).format ++ form(name).constraints).map(t => messages(t._1,t._2:_*)).mkString(", ")}]:*@
+}
+
+@helper.form(action = routes.FormExampleController.addProp()) {
+    @if(propForm.hasErrors) {
+        <table cellpadding="1" cellspacing="1">
+        @for(error <- propForm.errors) {
+            <tr><td>@error.key: @messages(error.messages, error.args:_*)</td></tr>
+        }
+        </table>
+    }
+    <table cellpadding="1" cellspacing="1">
+        <tbody>
+            <tr>
+                <td>@label(IntProp.KEY, propForm)</td>
+                <td>@textInput(IntProp.KEY, propForm)</td>
+                <td>@label(IntProp.VALUE, propForm)</td>
+                <td>@textInput(IntProp.VALUE, propForm)</td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="submit" value="Add">
+}

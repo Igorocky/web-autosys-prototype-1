@@ -10,7 +10,7 @@ object PropsHolderActor {
   case class GetAll()
 
   case class Success()
-  case class Error(msg: String)
+  case class Error(msg: String, props: List[IntProp])
 }
 
 class PropsHolderActor extends Actor {
@@ -23,7 +23,7 @@ class PropsHolderActor extends Actor {
       sender ! props
     case Add(prop) =>
       if (props.exists(_.key == prop.key)) {
-        sender ! Error(s"Property with key='${prop.key}' already exists")
+        sender ! Error(s"Property with key='${prop.key}' already exists", props)
       } else {
         props ::= prop
         sender ! Success()

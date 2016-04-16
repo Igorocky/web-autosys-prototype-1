@@ -33,27 +33,10 @@ class FormExampleController @Inject()(
 
   implicit val timeout = Timeout(5.seconds)
 
-  val valueConstraint: Constraint[Int] = Constraint("valueConstraint"){value=>
-    if (value < 0 || value > 100) {
-      Invalid(ValidationError("Value must be in range [0, 100]"))
-    } else {
-      Valid
-    }
-  }
-
-  implicit val intFormatter = new Formatter[Int] {
-    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Int] =
-      scala.util.control.Exception.allCatch
-        .either(data(key).toInt)
-        .left.map(e => Seq(FormError(key, "Should be integer")))
-
-    override def unbind(key: String, value: Int): Map[String, String] = ???
-  }
-
   val propForm = Form(
     mapping(
       IntProp.KEY -> nonEmptyText,
-      IntProp.VALUE -> of(intFormatter).verifying(valueConstraint)
+      IntProp.VALUE -> number(min = 0, max = 100)
     )(IntProp.apply)(IntProp.unapply)
   )
 

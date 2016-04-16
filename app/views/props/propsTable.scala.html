@@ -1,0 +1,29 @@
+@import views.html.props.textInput
+@import views.html.props.hidden
+@(allProps: List[IntProp], editPropForm: Form[IntProp])(implicit messages: Messages)
+    <table border="1" cellpadding="1" cellspacing="1">
+        <tr>
+            <td>KEY</td>
+            <td>VALUE</td>
+            <td></td>
+            <td></td>
+        </tr>
+        @for(prop <- allProps) {
+            <tr>
+                <td>@prop.key</td>
+                <td>
+                @if(!editPropForm(IntProp.KEY).value.exists(_ == prop.key)) {
+                    @prop.value
+                } else {
+                    @helper.form(action = routes.FormExampleController.editProp()) {
+                        @textInput(IntProp.VALUE, editPropForm)
+                        @hidden(IntProp.KEY, prop.key)
+                        <input type="submit" value="Save">
+                    }
+                }
+                </td>
+                <td><a href="@routes.FormExampleController.prepareEdit(prop.key)">edit</a></td>
+                <td><a href="@routes.FormExampleController.removeProp(prop.key)">delete</a></td>
+            </tr>
+        }
+    </table>

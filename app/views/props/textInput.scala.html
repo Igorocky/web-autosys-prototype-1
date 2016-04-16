@@ -1,0 +1,9 @@
+@(name: String, form: Form[_])(implicit messages: Messages)
+<input type="text" name="@name" value="@form(name).value.getOrElse("")"/>
+@if(form(name).hasErrors) {
+    <table cellpadding="1" cellspacing="1">
+    @for(error <- form(name).errors) {
+        <tr><td>@error.key: @messages(error.messages, error.args:_*)</td></tr>
+    }
+    </table>
+}

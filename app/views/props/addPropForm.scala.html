@@ -1,0 +1,23 @@
+@import views.html.props._
+@(addPropForm: Form[IntProp])(implicit messages: Messages)
+
+@helper.form(action = routes.FormExampleController.addProp()) {
+    @if(addPropForm.hasGlobalErrors) {
+        <table cellpadding="1" cellspacing="1">
+        @for(error <- addPropForm.globalErrors) {
+            <tr><td>@error.key: @messages(error.messages, error.args:_*)</td></tr>
+        }
+        </table>
+    }
+    <table cellpadding="1" cellspacing="1">
+        <tbody>
+            <tr>
+                <td>@label(IntProp.KEY, addPropForm)</td>
+                <td>@textInput(IntProp.KEY, addPropForm)</td>
+                <td>@label(IntProp.VALUE, addPropForm)</td>
+                <td>@textInput(IntProp.VALUE, addPropForm)</td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="submit" value="Add">
+}

@@ -5,6 +5,9 @@
 GET     /pwd                        controllers.HomeController.currDir
 GET     /allProps                   controllers.FormExampleController.allProps
 POST    /addProp                    controllers.FormExampleController.addProp
+GET     /remProp/:key               controllers.FormExampleController.removeProp(key)
+GET     /edit/:key                  controllers.FormExampleController.prepareEdit(key)
+POST    /editProp                   controllers.FormExampleController.editProp
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index

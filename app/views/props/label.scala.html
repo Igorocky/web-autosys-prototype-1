@@ -1,0 +1,2 @@
+@(name: String, form: Form[_])(implicit messages: Messages)
+@name @*[@{(form(name).format ++ form(name).constraints).map(t => messages(t._1,t._2:_*)).mkString(", ")}]:*@

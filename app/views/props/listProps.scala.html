@@ -1,0 +1,5 @@
+@import views.html.props._
+@(allProps: List[IntProp], addForm: Form[IntProp], editForm: Form[IntProp], errMsg: Option[String] = None)(implicit messages: Messages)
+@errMsg.map(e => Html(s"ERROR:$e</br>"))
+@addPropForm(addForm)
+@propsTable(allProps, editForm)

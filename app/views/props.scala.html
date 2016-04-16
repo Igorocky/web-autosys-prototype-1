@@ -1,12 +1,31 @@
 @(allProps: List[IntProp], propForm: Form[IntProp])(implicit messages: Messages)
 
+@textInput(name: String, form: Form[_]) = {
+    <input type="text" name="@name" value="@form(name).value.getOrElse("")"/>@form(name).constraints.map(_._1).mkString(", ")
+}
+
 @helper.form(action = routes.FormExampleController.addProp()) {
-    @helper.inputText(propForm("key"))
-    @helper.inputText(propForm("value"))
+    @if(propForm.hasErrors) {
+        <table cellpadding="1" cellspacing="1">
+        @for(error <- propForm.errors) {
+            <tr><td>@error.key: @error.messages.mkString(", ")</td></tr>
+        }
+        </table>
+    }
+    <table cellpadding="1" cellspacing="1">
+        <tbody>
+            <tr>
+                <td>key</td>
+                <td>@textInput(IntProp.KEY, propForm)</td>
+                <td>value</td>
+                <td>@textInput(IntProp.VALUE, propForm)</td>
+            </tr>
+        </tbody>
+    </table>
     <input type="submit" value="Add">
 }
 
-    <table>
+    <table border="1" cellpadding="1" cellspacing="1">
         @for(prop <- allProps) {
             <tr>
                 <td>@prop.key</td>

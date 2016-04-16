@@ -1,0 +1,16 @@
+@(allProps: List[IntProp], propForm: Form[IntProp])(implicit messages: Messages)
+
+@helper.form(action = routes.FormExampleController.addProp()) {
+    @helper.inputText(propForm("key"))
+    @helper.inputText(propForm("value"))
+    <input type="submit" value="Add">
+}
+
+    <table>
+        @for(prop <- allProps) {
+            <tr>
+                <td>@prop.key</td>
+                <td>@prop.value</td>
+            </tr>
+        }
+    </table>

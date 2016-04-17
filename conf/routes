@@ -9,6 +9,8 @@ GET     /remProp/:key               controllers.FormExampleController.removeProp
 GET     /edit/:key                  controllers.FormExampleController.prepareEdit(key)
 POST    /editProp                   controllers.FormExampleController.editProp
 
+GET    /printSchema                   controllers.FormExampleController.printSchema
+
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection

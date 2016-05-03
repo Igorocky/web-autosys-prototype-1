@@ -3,6 +3,8 @@ import com.google.inject.AbstractModule
 import java.time.Clock
 
 import play.api.libs.concurrent.AkkaGuiceSupport
+import services.initialisation.Initialisation
+import services.ssh.{SshService, SshServiceImpl}
 import services.{ApplicationTimer, AtomicCounter, Counter}
 
 /**
@@ -27,6 +29,10 @@ class Module extends AbstractModule with AkkaGuiceSupport {
     bind(classOf[Counter]).to(classOf[AtomicCounter])
 
     bindActor[PropsHolderActor]("props-holder-actor")
+
+    bind(classOf[SshService]).to(classOf[SshServiceImpl]).asEagerSingleton()
+
+    bind(classOf[Initialisation]).asEagerSingleton()
   }
 
 }

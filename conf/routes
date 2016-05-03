@@ -9,6 +9,8 @@ GET     /remProp/:key               controllers.FormExampleController.removeProp
 GET     /edit/:key                  controllers.FormExampleController.prepareEdit(key)
 POST    /editProp                   controllers.FormExampleController.editProp
 
+GET     /ssh/date                   controllers.SshController.date
+
 GET    /printSchema                   controllers.FormExampleController.printSchema
 
 # An example controller showing a sample home page

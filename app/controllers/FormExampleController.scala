@@ -6,12 +6,13 @@ import actors.PropsHolderActor._
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
-import dbmappings.IntProps
+import dbmappings.Schema.intProps
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{Action, Controller}
+import slick.driver.H2Driver.api._
 import views.html.props._
 
 import scala.concurrent.Await
@@ -108,8 +109,6 @@ class FormExampleController @Inject()(
   private def getProp(key: String) = Await.result((propsHolderActor ? Get(key)).map(_.asInstanceOf[IntProp]), 5.seconds)
 
   def printSchema = Action{
-    import slick.driver.H2Driver.api._
-    val intProps = TableQuery[IntProps]
     Ok(intProps.schema.create.statements.map(_.toString).mkString("\n"))
   }
 }

@@ -1,7 +1,16 @@
 package actors
 
+import javax.inject.Inject
+
 import akka.actor.{Actor, Props}
 import controllers.IntProp
+import dbmappings.Schema
+import dbmappings.Schema.intProps
+import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
+import slick.driver.JdbcProfile
+
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 object PropsHolderActor {
   def props = Props[PropsHolderActor]
@@ -16,14 +25,15 @@ object PropsHolderActor {
   case class Error(msg: String, props: List[IntProp])
 }
 
-class PropsHolderActor extends Actor {
+class PropsHolderActor /*@Inject()(protected val dbConfigProvider: DatabaseConfigProvider)*/ extends Actor /*with HasDatabaseConfigProvider[JdbcProfile]*/ {
   import PropsHolderActor._
+  /*import driver.api._*/
 
   private var props = List[IntProp]()
 
   override def receive = {
     case GetAll() =>
-      sender ! props
+      /*sender ! Await.result(db.run(intProps.result), 5.seconds).map(Schema.intProp(_)).toList*/
     case Add(prop) =>
       if (props.exists(_.key == prop.key)) {
         sender ! Error(s"Property with key='${prop.key}' already exists", props)

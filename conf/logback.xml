@@ -14,6 +14,7 @@
     <file>${application.home:-.}/logs/application2.log</file>
     <encoder>
       <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
+      <!--<pattern>%date [%level] %logger - %message%n%xException</pattern>-->
     </encoder>
   </appender>
 

@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
   ,"com.typesafe.play" %% "play-slick-evolutions" % "2.0.0"
   ,"org.apache.commons" % "commons-pool2" % "2.4.2"
   ,"org.apache.sshd" % "sshd-core" % "1.1.1"
+  ,"com.jcraft" % "jsch" % "0.1.53"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

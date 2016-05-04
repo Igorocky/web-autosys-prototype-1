@@ -17,7 +17,7 @@ class SshServiceImpl @Inject() (actorSystem: ActorSystem, appLifecycle: Applicat
   val log: Logger = Logger(this.getClass())
 
   private final val EXECUTION_CONTEXT_CONFIG_NAME: String = "execution-contexts.ssh-service"
-  private final val MAX_TOTAL = 2
+  private final val MAX_TOTAL = 1
 
   implicit private val executionContext = actorSystem.dispatchers.lookup(EXECUTION_CONTEXT_CONFIG_NAME)
 
@@ -52,7 +52,7 @@ class SshServiceImpl @Inject() (actorSystem: ActorSystem, appLifecycle: Applicat
             override def passivateObject(p: PooledObject[SshConnection]): Unit = {}
 
             override def makeObject(): PooledObject[SshConnection] = {
-              new DefaultPooledObject(new SshConnection(host, port, login, password))
+              new DefaultPooledObject(new SshConnection1(host, port, login, password))
             }
           },
           new GenericObjectPoolConfig {

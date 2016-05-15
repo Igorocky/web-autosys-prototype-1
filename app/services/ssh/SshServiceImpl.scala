@@ -52,7 +52,7 @@ class SshServiceImpl @Inject() (actorSystem: ActorSystem, appLifecycle: Applicat
             override def passivateObject(p: PooledObject[SshConnection]): Unit = {}
 
             override def makeObject(): PooledObject[SshConnection] = {
-              new DefaultPooledObject(new SshConnection1(host, port, login, password))
+              new DefaultPooledObject(new SshConnection2(host, port, login, password))
             }
           },
           new GenericObjectPoolConfig {
@@ -64,7 +64,7 @@ class SshServiceImpl @Inject() (actorSystem: ActorSystem, appLifecycle: Applicat
         )
       }
       log.debug("connected.")
-      Right()
+      Right(())
     } catch {
       case ex: Exception => Left(AWCException(ex.getMessage, ex))
     }

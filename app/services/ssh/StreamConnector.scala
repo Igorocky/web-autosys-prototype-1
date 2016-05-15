@@ -1,15 +1,15 @@
 package services.ssh
 
-import java.io.{InputStream, OutputStream}
-import java.util.concurrent.LinkedBlockingQueue
+import java.io.OutputStream
 
 class StreamConnector(name: String) extends OutputStream {
   private val inPart = new StreamConnectorIn(name)
 
-  override def write(b: Int): Unit = inPart.write(b)
-
   def getInputStream = inPart
+
   def getOutputStream = this
+
+  override def write(b: Int): Unit = inPart.write(b)
 
   def write(str: String) = inPart.write(str)
 }

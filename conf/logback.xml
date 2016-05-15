@@ -47,9 +47,9 @@
 
     <logger name="akka.actor" level="INFO"/>
 
-    <!--<logger name="services" level="TRACE" additivity="false">-->
-        <!--<appender-ref ref="ASYNCFILE2"/>-->
-    <!--</logger>-->
+    <logger name="services" level="DEBUG" additivity="false">
+        <appender-ref ref="ASYNCFILE2"/>
+    </logger>
 
     <root level="WARN">
         <appender-ref ref="ASYNCFILE"/>

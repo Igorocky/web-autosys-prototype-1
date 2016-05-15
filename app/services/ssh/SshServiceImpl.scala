@@ -4,9 +4,8 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import com.google.inject.Singleton
-import exceptions.AWCException
-import org.apache.commons.pool2.{ObjectPool, PooledObject, PooledObjectFactory}
 import org.apache.commons.pool2.impl.{DefaultPooledObject, GenericObjectPool, GenericObjectPoolConfig}
+import org.apache.commons.pool2.{ObjectPool, PooledObject, PooledObjectFactory}
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
 
@@ -28,46 +27,45 @@ class SshServiceImpl @Inject() (actorSystem: ActorSystem, appLifecycle: Applicat
     Future.successful(())
   }
 
-  override def executeCommand(connectionTag: SshConnectionTag, command: String): Future[String] = Future {
+  override def executeCommand(connectionTag: SshConnectionTag, command: String,
+                              params: Option[Map[String, String]] = None, prompt: Option[String] = None,
+                              timeoutMillis: Option[Long] = None): Future[Array[String]] = Future {
     log.debug(s"executeCommand on ${connectionTag.name}: '$command'")
     val sshConnection: SshConnection = connections(connectionTag).borrowObject()
-    val res = sshConnection.exec(command)
-    connections(connectionTag).returnObject(sshConnection)
-    log.debug(s"executeCommand on ${connectionTag.name} result: '$res'")
-    res
+    try {
+      val res = sshConnection.exec(command, params, prompt, timeoutMillis)
+      log.debug(s"executeCommand on ${connectionTag.name} results in: '$res'")
+      res
+    } finally {
+      connections(connectionTag).returnObject(sshConnection)
+    }
   }
 
-  override def connect(newConnectionTag: SshConnectionTag, host: String, port: Int, login: String, password: String): Future[Either[AWCException, Unit]] = Future {
-    log.debug(s"connect request: newConnectionTag = $newConnectionTag, host = $host, port = $port, login = $login")
-    try {
-      connections += newConnectionTag -> {
-        new GenericObjectPool(
-          new PooledObjectFactory[SshConnection] {
-            override def destroyObject(p: PooledObject[SshConnection]): Unit = p.getObject.close()
+  override def connect(newConnectionTag: SshConnectionTag, host: String, port: Int, login: String, password: String): Future[Unit] = Future {
+    log.debug(s"creating pool for: newConnectionTag = $newConnectionTag, host = $host, port = $port, login = $login")
+    connections += newConnectionTag -> new GenericObjectPool(
+      new PooledObjectFactory[SshConnection] {
+        override def destroyObject(p: PooledObject[SshConnection]): Unit = p.getObject.close()
 
-            override def validateObject(p: PooledObject[SshConnection]): Boolean = p.getObject.validate()
+        override def validateObject(p: PooledObject[SshConnection]): Boolean = p.getObject.validate()
 
-            override def activateObject(p: PooledObject[SshConnection]): Unit = {}
+        override def activateObject(p: PooledObject[SshConnection]): Unit = {}
 
-            override def passivateObject(p: PooledObject[SshConnection]): Unit = {}
+        override def passivateObject(p: PooledObject[SshConnection]): Unit = {}
 
-            override def makeObject(): PooledObject[SshConnection] = {
-              new DefaultPooledObject(new SshConnection2(host, port, login, password))
-            }
-          },
-          new GenericObjectPoolConfig {
-            setTestOnCreate(true)
-            setTestOnBorrow(true)
-            setBlockWhenExhausted(true)
-            setMaxTotal(MAX_TOTAL)
-          }
-        )
+        override def makeObject(): PooledObject[SshConnection] = {
+          new DefaultPooledObject(new JSchSshConnection(host, port, login, password))
+        }
+      },
+      new GenericObjectPoolConfig {
+        setTestOnCreate(true)
+        setTestOnBorrow(true)
+        setBlockWhenExhausted(true)
+        setMaxTotal(MAX_TOTAL)
       }
-      log.debug("connected.")
-      Right(())
-    } catch {
-      case ex: Exception => Left(AWCException(ex.getMessage, ex))
-    }
+    )
+    log.debug(s"pool created for: newConnectionTag = $newConnectionTag, host = $host, port = $port, login = $login")
+    Right(())
   }
 
   def close() = {

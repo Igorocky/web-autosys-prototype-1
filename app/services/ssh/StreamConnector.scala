@@ -1,15 +1,9 @@
 package services.ssh
 
-import java.io.OutputStream
+class StreamConnector(name: String) {
+  private val streamConnectorOut = new StreamConnectorOut(name)
 
-class StreamConnector(name: String) extends OutputStream {
-  private val inPart = new StreamConnectorIn(name)
+  val input = streamConnectorOut.getInputStream
 
-  def getInputStream = inPart
-
-  def getOutputStream = this
-
-  override def write(b: Int): Unit = inPart.write(b)
-
-  def write(str: String) = inPart.write(str)
+  val output = streamConnectorOut
 }

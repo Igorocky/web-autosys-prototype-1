@@ -1,3 +1,5 @@
-@(dateStr: String)
+@(dateStr: Array[String])
 
-@dateStr
+@for(r <- dateStr){
+    <div>@r</div>
+}

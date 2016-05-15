@@ -27,12 +27,12 @@ class StreamConnectorIn(name: String) extends InputStream {
 
   override def available(): Int = queue.size()
 
-  def write(b: Int): Unit = {
+  protected[ssh] def write(b: Int): Unit = {
     log.trace(s"[$name]putting '${b.toChar}' {$b}")
     queue.put(b)
   }
 
-  def write(str: String): Unit = {
+  protected[ssh] def write(str: String): Unit = {
     str.view.map(_.toInt).foreach(write)
   }
 }

@@ -61,7 +61,7 @@ class JSchSshConnection(host: String, port: Int, login: String, password: String
   }
 
   private def writeCmd(cmd: String): Unit = {
-    output.write(cmd + "\r\n")
+    output.write(cmd + "\n")
   }
 
   private def readStrOrWait(waitMillis: Long = 50L): String = {
@@ -140,7 +140,7 @@ class JSchSshConnection(host: String, port: Int, login: String, password: String
       channel.connect()
       log.debug(s"$connectionName: channel connected")
 
-      (session, channel, userOutputStream.output, userOutputStream.input)
+      (session, channel, userOutputStream.output, userInputStream.input)
     } catch {
       case ex: Exception =>
         log.error(s"Exception while connecting to $connectionName: " + ex.getMessage)

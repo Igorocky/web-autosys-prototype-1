@@ -10,6 +10,9 @@ GET     /edit/:key                  controllers.FormExampleController.prepareEdi
 POST    /editProp                   controllers.FormExampleController.editProp
 
 GET     /ssh/date                   controllers.SshController.date
+GET     /ssh/schema                   controllers.SshController.printSchema
+GET     /ssh/users                   controllers.SshController.users
+POST    /ssh/addUser                controllers.SshController.add
 
 GET    /printSchema                   controllers.FormExampleController.printSchema
 

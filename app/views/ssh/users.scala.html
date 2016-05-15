@@ -1,0 +1,20 @@
+@import services.dao.User
+@(allUsers: List[User])
+
+<!DOCTYPE html>
+<html>
+    <head>
+        @ssh.mdlImports()
+    </head>
+    <body>
+        @helper.form(action = routes.SshController.add) {
+            <div class="mdl-textfield mdl-js-textfield">
+                <input class="mdl-textfield__input" type="text" name="@AddUserFormObj.NAME">
+                <label class="mdl-textfield__label" for="sample1">New user name</label>
+            </div>
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                Create
+            </button>
+        }
+    </body>
+</html>

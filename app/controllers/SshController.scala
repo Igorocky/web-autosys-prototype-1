@@ -2,6 +2,10 @@ package controllers
 
 import javax.inject._
 
+import akka.actor.ActorSystem
+import akka.stream._
+import akka.stream.scaladsl.Sink.head
+import akka.stream.scaladsl.Source.fromFuture
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
@@ -10,8 +14,6 @@ import play.api.mvc._
 import services.dao.{User, UserObj, UsersDao}
 import services.ssh.{SshConnectionTag, SshService}
 
-import scala.concurrent.ExecutionContext
-
 object AddUserFormObj {
   val NAME = "name"
 }
@@ -19,12 +21,12 @@ object AddUserFormObj {
 case class AddUserForm(name: String)
 
 @Singleton
-class SshController @Inject()(sshService: SshService, usersDao: UsersDao)(
-  implicit exec: ExecutionContext,
-  val messagesApi: MessagesApi
-) extends Controller with I18nSupport {
+class SshController @Inject()(sshService: SshService, usersDao: UsersDao)
+                             (val messagesApi: MessagesApi,
+                              implicit private val actorSystem: ActorSystem) extends Controller with I18nSupport {
 
-  val log: Logger = Logger(this.getClass())
+  private val log: Logger = Logger(this.getClass())
+  private implicit val materializer = ActorMaterializer()
 
   val addUserForm = Form(
     mapping(
@@ -33,7 +35,9 @@ class SshController @Inject()(sshService: SshService, usersDao: UsersDao)(
   )
 
   def date = Action.async {
-    sshService.executeCommand(SshConnectionTag("localhost-tag"), "date").map(r => Ok(views.html.ssh.date(r)))
+    fromFuture(sshService.executeCommand(SshConnectionTag("localhost-tag"), "date"))
+      .map(r => Ok(views.html.ssh.date(r)))
+      .runWith(head)
   }
 
   def printSchema = Action {
@@ -53,7 +57,7 @@ class SshController @Inject()(sshService: SshService, usersDao: UsersDao)(
       }
     )
   ){request =>
-    usersDao.getUserByName(request.body.name).map{userOpt =>
+    fromFuture(usersDao.getUserByName(request.body.name)).map{userOpt =>
       if (userOpt.isEmpty) {
         usersDao.addUser(User(None, request.body.name))
         Redirect(routes.SshController.users)
@@ -61,6 +65,6 @@ class SshController @Inject()(sshService: SshService, usersDao: UsersDao)(
         log.error("User already exists")
         BadRequest(views.html.ssh.users(List()))
       }
-    }
+    }.runWith(head)
   }
 }

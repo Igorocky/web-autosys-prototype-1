@@ -68,4 +68,8 @@ class SshController @Inject()(sshService: SshService, usersDao: UsersDao)
           .map(users => BadRequest(views.html.ssh.users(users)))
     }.runWith(head)
   }
+
+  def delete(id: Long) = Action.async{
+    fromFuture(usersDao.deleteUser(id)).map(_ => Redirect(routes.SshController.users)).runWith(head)
+  }
 }

@@ -30,4 +30,6 @@ class UsersDaoImpl @Inject()(protected val dbConfigProvider: DatabaseConfigProvi
     fromPublisher(db.stream(users.result))
       .fold(List[User]())((t, o) => o::t )
       .map(_.reverse)
+
+  override def deleteUser(id: Long): Future[Int] = db.run(users.filter(_.id === id).delete)
 }

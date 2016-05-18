@@ -13,6 +13,7 @@ GET     /ssh/date                   controllers.SshController.date
 GET     /ssh/schema                   controllers.SshController.printSchema
 GET     /ssh/users                   controllers.SshController.users
 POST    /ssh/addUser                controllers.SshController.add
+GET     /ssh/deleteUser/:id               controllers.SshController.delete(id: Long)
 
 GET    /printSchema                   controllers.FormExampleController.printSchema
 

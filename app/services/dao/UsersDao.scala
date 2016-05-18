@@ -9,5 +9,6 @@ trait UsersDao {
   def getSchema: List[String]
   def getUserByName(name: String): Future[Option[User]]
   def addUser(user: User): Future[Int]
+  def deleteUser(id: Long): Future[Int]
   def getAllUsers: Source[List[User], NotUsed]
 }

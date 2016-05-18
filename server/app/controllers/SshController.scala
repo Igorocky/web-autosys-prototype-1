@@ -7,6 +7,7 @@ import akka.stream._
 import akka.stream.scaladsl.Sink.head
 import akka.stream.scaladsl.Source.fromFuture
 import akka.stream.scaladsl._
+import play.api.Environment
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
@@ -24,7 +25,8 @@ case class AddUserForm(name: String)
 @Singleton
 class SshController @Inject()(sshService: SshService, usersDao: UsersDao)
                              (val messagesApi: MessagesApi,
-                              implicit private val actorSystem: ActorSystem) extends Controller with I18nSupport {
+                              implicit private val actorSystem: ActorSystem,
+                              implicit private val environment: Environment) extends Controller with I18nSupport {
 
   private val log: Logger = Logger(this.getClass())
   private implicit val materializer = ActorMaterializer()

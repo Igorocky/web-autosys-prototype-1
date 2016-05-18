@@ -1,21 +1,69 @@
-name := """web-autosys-prototype-1"""
+import sbt.Project.projectToRef
 
-version := "1.0-SNAPSHOT"
+lazy val clients = Seq(client)
+lazy val scalaV = "2.11.8"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val server = (project in file("server")).settings(
+  scalaVersion := scalaV,
+  scalaJSProjects := clients,
+  pipelineStages := Seq(scalaJSProd, gzip),
+  resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases",
+  libraryDependencies ++= Seq(
+    "com.vmunier" %% "play-scalajs-scripts" % "0.5.0"
+    ,"org.webjars" % "jquery" % "1.11.1"
+    ,specs2 % Test
+    ,cache
+    ,ws
+    ,evolutions
+    ,"org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
+    ,"com.typesafe.play" %% "play-slick" % "2.0.0"
+    ,"com.typesafe.play" %% "play-slick-evolutions" % "2.0.0"
+    ,"org.apache.commons" % "commons-pool2" % "2.4.2"
+    ,"com.jcraft" % "jsch" % "0.1.53"
+  )
+).enablePlugins(PlayScala).
+  aggregate(clients.map(projectToRef): _*).
+  dependsOn(sharedJvm)
 
-scalaVersion := "2.11.7"
+lazy val client = (project in file("client")).settings(
+  scalaVersion := scalaV,
+  persistLauncher := true,
+  persistLauncher in Test := false,
+  libraryDependencies ++= Seq(
+    "org.scala-js" %%% "scalajs-dom" % "0.8.0"
+  )
+).enablePlugins(ScalaJSPlugin, ScalaJSPlay).
+  dependsOn(sharedJs)
 
-libraryDependencies ++= Seq(
-  cache
-  ,ws
-  ,evolutions
-  ,"org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
-  ,"com.typesafe.play" %% "play-slick" % "2.0.0"
-  ,"com.typesafe.play" %% "play-slick-evolutions" % "2.0.0"
-  ,"org.apache.commons" % "commons-pool2" % "2.4.2"
-  ,"org.apache.sshd" % "sshd-core" % "1.1.1"
-  ,"com.jcraft" % "jsch" % "0.1.53"
-)
+lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared")).
+  settings(scalaVersion := scalaV).
+  jsConfigure(_ enablePlugins ScalaJSPlay)
 
-resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+lazy val sharedJvm = shared.jvm
+lazy val sharedJs = shared.js
+
+// loads the Play project at sbt startup
+onLoad in Global := (Command.process("project server", _: State)) compose (onLoad in Global).value
+
+
+//name := """web-autosys-prototype-1"""
+//
+//version := "1.0-SNAPSHOT"
+//
+//lazy val root = (project in file(".")).enablePlugins(PlayScala)
+//
+//scalaVersion := "2.11.7"
+//
+//libraryDependencies ++= Seq(
+//  cache
+//  ,ws
+//  ,evolutions
+//  ,"org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0-RC1" % Test
+//  ,"com.typesafe.play" %% "play-slick" % "2.0.0"
+//  ,"com.typesafe.play" %% "play-slick-evolutions" % "2.0.0"
+//  ,"org.apache.commons" % "commons-pool2" % "2.4.2"
+//  ,"org.apache.sshd" % "sshd-core" % "1.1.1"
+//  ,"com.jcraft" % "jsch" % "0.1.53"
+//)
+//
+//resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

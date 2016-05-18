@@ -6,6 +6,7 @@ import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.scaladsl.Sink.head
 import akka.stream.scaladsl.Source.fromFuture
+import akka.stream.scaladsl._
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
@@ -44,8 +45,8 @@ class SshController @Inject()(sshService: SshService, usersDao: UsersDao)
     Ok(views.html.ssh.schema(usersDao.getSchema))
   }
 
-  def users = Action {
-    Ok(views.html.ssh.users(List()))
+  def users = Action.async {
+    usersDao.getAllUsers.map(us => Ok(views.html.ssh.users(us))).runWith(head)
   }
 
   def add = Action.async(
@@ -57,14 +58,14 @@ class SshController @Inject()(sshService: SshService, usersDao: UsersDao)
       }
     )
   ){request =>
-    fromFuture(usersDao.getUserByName(request.body.name)).map{userOpt =>
-      if (userOpt.isEmpty) {
-        usersDao.addUser(User(None, request.body.name))
-        Redirect(routes.SshController.users)
-      } else {
-        log.error("User already exists")
-        BadRequest(views.html.ssh.users(List()))
-      }
+    fromFuture(usersDao.getUserByName(request.body.name)).flatMapConcat{
+      case None =>
+        fromFuture(usersDao.addUser(User(None, request.body.name)))
+          .map(_ => Redirect(routes.SshController.users))
+      case _ =>
+        Source.single(log.error("User already exists"))
+          .flatMapConcat(_ => usersDao.getAllUsers)
+          .map(users => BadRequest(views.html.ssh.users(users)))
     }.runWith(head)
   }
 }
